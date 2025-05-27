@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List RPG</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Open+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="game-container">
+      <header>
+        <h1>To-Do List RPG</h1>
+      </header>
+
+      <section id="class-selection-screen" class="screen active">
+        <h2>Escolha sua Classe:</h2>
+        <div class="class-options">
+          <button data-class="Guerreiro" class="class-button warrior">
+            <img
+              src="https://img.icons8.com/ios-filled/50/000000/sword.png"
+              alt="Warrior Icon"
+            />
+            Guerreiro
+          </button>
+          <button data-class="Mago" class="class-button mage">
+            <img
+              src="https://img.icons8.com/ios-filled/50/000000/wizard.png"
+              alt="Mage Icon"
+            />
+            Mago
+          </button>
+          <button data-class="Arqueiro" class="class-button archer">
+            <img
+              src="https://img.icons8.com/ios-filled/50/000000/archers-bow.png"
+              alt="Archer Icon"
+            />
+            Arqueiro
+          </button>
+        </div>
+        <p class="class-description">
+          <strong>Guerreiro:</strong> Enfrenta tarefas com força bruta e
+          determinação! <br />
+          <strong>Mago:</strong> Usa sabedoria e feitiços para aniquilar
+          pendências! <br />
+          <strong>Arqueiro:</strong> Precisão e foco para atingir todos os alvos
+          (tarefas)!
+        </p>
+      </section>
+
+      <section id="main-app-screen" class="screen">
+        <div id="character-status">
+          <h2>Status do Aventureiro</h2>
+          <p><strong>Classe:</strong> <span id="char-class">N/A</span></p>
+          <p><strong>Nível:</strong> <span id="char-level">1</span></p>
+          <p>
+            <strong>XP:</strong> <span id="char-xp">0</span> /
+            <span id="char-xp-next">100</span>
+          </p>
+          <div class="xp-bar-container">
+            <div id="xp-bar-fill"></div>
+          </div>
+        </div>
+
+        <div id="task-manager">
+          <h2>Minhas Missões (Tarefas)</h2>
+          <div class="task-input-area">
+            <input
+              type="text"
+              id="new-task-input"
+              placeholder="Descreva sua nova missão..."
+            />
+            <button id="add-task-btn">Adicionar Missão</button>
+          </div>
+
+          <div class="task-lists">
+            <div class="task-list-container">
+              <h3>Missões Pendentes</h3>
+              <ul id="pending-tasks-list"></ul>
+            </div>
+            <div class="task-list-container">
+              <h3>Missões Concluídas</h3>
+              <ul id="completed-tasks-list"></ul>
+            </div>
+          </div>
+        </div>
+        <button id="reset-game-btn">Recomeçar Aventura (Resetar)</button>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
