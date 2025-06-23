@@ -42,12 +42,19 @@
           </button>
         </div>
         <p class="class-description">
-          <strong>Guerreiro:</strong> Enfrenta tarefas com força bruta e
-          determinação! <br />
-          <strong>Mago:</strong> Usa sabedoria e feitiços para aniquilar
-          pendências! <br />
-          <strong>Arqueiro:</strong> Precisão e foco para atingir todos os alvos
-          (tarefas)!
+          <strong>Guerreiro:</strong> Forte e focado, pode ter até
+          <span style="color: #d63031; font-weight: bold;">5 missões</span>
+          pendentes, cada uma rendendo
+          <span style="color: green; font-weight: bold;">30 XP</span>. <br />
+          <strong>Mago:</strong> Estrategista e versátil, pode ter até
+          <span style="color: #0984e3; font-weight: bold;">5 missões</span>
+          pendentes e
+          <span style="color: #0984e3; font-weight: bold;">escolhe a dificuldade</span>
+          (20, 30 ou 50 XP). <br />
+          <strong>Arqueiro:</strong> Ágil e numeroso, pode ter até
+          <span style="color: #00b894; font-weight: bold;">8 missões</span>
+          pendentes, cada uma rendendo
+          <span style="color: green; font-weight: bold;">20 XP</span>.
         </p>
       </section>
 
@@ -65,6 +72,11 @@
           </div>
         </div>
 
+        <!-- Nova seção para dicas/bônus da classe -->
+        <div id="class-perk-display" class="class-description">
+          <!-- Conteúdo gerado pelo JS -->
+        </div>
+
         <div id="task-manager">
           <h2>Minhas Missões (Tarefas)</h2>
           <div class="task-input-area">
@@ -73,6 +85,11 @@
               id="new-task-input"
               placeholder="Descreva sua nova missão..."
             />
+            <select id="task-difficulty">
+              <option value="facil">Fácil</option>
+              <option value="normal" selected>Normal</option>
+              <option value="dificil">Difícil</option>
+            </select>
             <button id="add-task-btn">Adicionar Missão</button>
           </div>
 
@@ -89,6 +106,40 @@
         </div>
         <button id="reset-game-btn">Recomeçar Aventura (Resetar)</button>
       </section>
+    </div>
+
+    <!-- Modal para Missão Bônus -->
+    <div id="bonus-task-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Nova Missão Bônus!</h3>
+        <p>Parabéns, aventureiro! Ao atingir o Nível <span id="modal-level"></span>, você pode adicionar uma missão bônus especial.</p>
+        <input type="text" id="bonus-task-input" placeholder="Descreva sua missão bônus (ex: Ir ao shopping, Jogar, Descansar)..." />
+        <div class="modal-buttons">
+          <button id="add-bonus-task-btn">Adicionar Missão Bônus</button>
+          <button id="cancel-bonus-task-btn">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmação customizado (para substituir confirm()) -->
+    <div id="custom-confirm-modal" class="modal-overlay">
+      <div class="modal-content">
+        <p id="custom-confirm-message"></p>
+        <div class="modal-buttons">
+          <button id="custom-confirm-yes">Sim</button>
+          <button id="custom-confirm-no">Não</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Alerta customizado (para substituir alert()) -->
+    <div id="custom-alert-modal" class="modal-overlay">
+      <div class="modal-content">
+        <p id="custom-alert-message"></p>
+        <div class="modal-buttons">
+          <button id="custom-alert-ok">OK</button>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>

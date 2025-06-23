@@ -1,7 +1,7 @@
 /* Estilos Globais */
 body {
   font-family: "Open Sans", sans-serif;
-  background-color: #f0f0f0; 
+  background-color: #f0f0f0;
   color: #333;
   margin: 0;
   padding: 20px;
@@ -52,6 +52,8 @@ header h1 {
   display: flex;
   justify-content: space-around;
   margin: 25px 0;
+  flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+  gap: 15px; /* Espaçamento entre os botões */
 }
 .class-button {
   font-family: "MedievalSharp", cursive;
@@ -66,7 +68,16 @@ header h1 {
   flex-direction: column;
   align-items: center;
   min-width: 120px;
+  flex: 1; /* Permite que os botões cresçam e ocupem o espaço disponível */
+  max-width: 30%; /* Limita o tamanho máximo em telas maiores */
 }
+
+@media (max-width: 480px) {
+  .class-button {
+    max-width: 45%; /* Duas colunas em telas muito pequenas */
+  }
+}
+
 .class-button img {
   margin-bottom: 8px;
   width: 40px; /* Tamanho dos ícones */
@@ -79,15 +90,15 @@ header h1 {
 .class-button.warrior:hover {
   background-color: #ff7675;
   border-color: #d63031;
-} 
+}
 .class-button.mage:hover {
   background-color: #74b9ff;
   border-color: #0984e3;
-} 
+}
 .class-button.archer:hover {
   background-color: #55efc4;
   border-color: #00b894;
-} 
+}
 
 .class-description {
   text-align: center;
@@ -102,7 +113,7 @@ header h1 {
 
 /* Status do Personagem */
 #character-status {
-  background-color: #f9f2e8; 
+  background-color: #f9f2e8;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 25px;
@@ -135,6 +146,24 @@ header h1 {
   transition: width 0.5s ease-in-out;
 }
 
+/* Nova seção para dicas/bônus da classe */
+#class-perk-display {
+  background-color: #e6f2f9; /* Um azul claro */
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid #cce0eb;
+  text-align: center;
+  font-size: 1em;
+  color: #336699;
+  line-height: 1.4;
+}
+#class-perk-display strong {
+  font-family: "MedievalSharp", cursive;
+  color: #4a4a4a;
+  font-size: 1.1em;
+}
+
 /* Gerenciador de Tarefas */
 #task-manager h2 {
   font-family: "MedievalSharp", cursive;
@@ -145,27 +174,52 @@ header h1 {
 .task-input-area {
   display: flex;
   margin-bottom: 20px;
+  flex-wrap: wrap; /* Permite que os elementos quebrem a linha em telas menores */
+  gap: 10px; /* Espaçamento entre os elementos */
 }
 #new-task-input {
   flex-grow: 1;
   padding: 12px;
   border: 2px solid #ccc;
-  border-radius: 5px 0 0 5px;
+  border-radius: 5px; /* Arredondado em todos os cantos */
   font-size: 1em;
+  min-width: 150px; /* Garante que não fique muito pequeno */
 }
 #new-task-input:focus {
   outline: none;
   border-color: #82c91e;
 }
+
+#task-difficulty {
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  appearance: none; /* Remove estilo padrão do navegador */
+  background-image: url('data:image/svg+xml;utf8,<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
+  flex-shrink: 0; /* Impede que ele encolha demais */
+}
+
+#task-difficulty:focus {
+  outline: none;
+  border-color: #82c91e;
+}
+
 #add-task-btn {
   padding: 12px 20px;
-  background-color: #5a3a22; 
+  background-color: #5a3a22;
   color: white;
   border: none;
-  border-radius: 0 5px 5px 0;
+  border-radius: 5px; /* Arredondado em todos os cantos */
   cursor: pointer;
   font-size: 1em;
   transition: background-color 0.3s ease;
+  flex-shrink: 0; /* Impede que ele encolha demais */
 }
 #add-task-btn:hover {
   background-color: #4a2f1e;
@@ -178,7 +232,7 @@ header h1 {
 }
 
 @media (min-width: 600px) {
-  /* Duas colunas em telas maiores (responsibilidade) */
+  /* Duas colunas em telas maiores (responsividade) */
   .task-lists {
     grid-template-columns: 1fr 1fr;
   }
@@ -209,19 +263,55 @@ header h1 {
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.3s ease;
+  flex-wrap: wrap; /* Permite que o conteúdo da tarefa quebre linha */
 }
 #pending-tasks-list li:hover {
   background-color: #f5f5f5;
 }
 
-.task-text {
+.task-content {
+  /* Novo estilo para o container do texto e detalhes da tarefa */
   flex-grow: 1;
   margin-right: 10px;
+  display: flex;
+  flex-direction: column; /* Coloca texto e detalhes em linhas diferentes */
+  font-size: 1em;
 }
 
-#completed-tasks-list li .task-text {
+.task-text {
+  font-weight: bold;
+}
+
+.task-details {
+  font-size: 0.85em; /* Fonte menor para detalhes como dificuldade/XP */
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+#completed-tasks-list li .task-text,
+#completed-tasks-list li .task-details {
+  /* Aplica estilo de concluído para ambos */
   text-decoration: line-through;
   color: #888;
+}
+
+.task-actions {
+  /* Container para os botões de ação */
+  display: flex;
+  gap: 5px; /* Espaçamento entre os botões */
+  margin-top: 5px; /* Adiciona margem acima em telas pequenas */
+  flex-shrink: 0;
+}
+
+@media (min-width: 600px) {
+  .task-actions {
+    margin-top: 0; /* Remove margem em telas maiores */
+  }
+  .task-content {
+    flex-direction: row; /* Volta para linha única em telas maiores */
+    align-items: baseline;
+    gap: 5px; /* Espaçamento entre texto e detalhes */
+  }
 }
 
 .complete-btn {
@@ -232,13 +322,14 @@ header h1 {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9em;
+  transition: background-color 0.3s ease;
 }
 .complete-btn:hover {
   background-color: #45a049;
 }
 
 .delete-btn {
-  background-color: #f44336; 
+  background-color: #f44336;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -246,6 +337,7 @@ header h1 {
   cursor: pointer;
   font-size: 0.9em;
   margin-left: 5px; /* Pequeno espaço se houver outro botão */
+  transition: background-color 0.3s ease;
 }
 .delete-btn:hover {
   background-color: #da190b;
@@ -266,4 +358,106 @@ header h1 {
 }
 #reset-game-btn:hover {
   background-color: #a93226;
+}
+
+/* Estilos para Modals Customizados */
+.modal-overlay {
+  display: flex; /* Muda de 'none' para 'flex' */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Garante que fique por cima de tudo */
+  transition: opacity 0.3s ease;
+  opacity: 0; /* Inicia com opacidade 0 */
+  pointer-events: none; /* Não interage com eventos do mouse quando não ativo */
+}
+
+.modal-overlay.active {
+  opacity: 1; /* Transiciona para opacidade 1 quando ativo */
+  pointer-events: auto; /* Permite interação quando ativo */
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  transform: translateY(-20px); /* Efeito de entrada */
+  transition: transform 0.3s ease;
+  font-family: "Open Sans", sans-serif;
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0); /* Posição final */
+}
+
+.modal-content h3 {
+  font-family: "MedievalSharp", cursive;
+  color: #5a3a22;
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+.modal-content p {
+  margin-bottom: 20px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.modal-content input[type="text"] {
+  width: calc(100% - 24px); /* Contando padding */
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#add-bonus-task-btn,
+#custom-confirm-yes,
+#custom-alert-ok {
+  background-color: #4caf50; /* Verde */
+  color: white;
+}
+
+#add-bonus-task-btn:hover,
+#custom-confirm-yes:hover,
+#custom-alert-ok:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+#cancel-bonus-task-btn,
+#custom-confirm-no {
+  background-color: #f44336; /* Vermelho */
+  color: white;
+}
+
+#cancel-bonus-task-btn:hover,
+#custom-confirm-no:hover {
+  background-color: #da190b;
+  transform: translateY(-2px);
 }
