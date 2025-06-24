@@ -25,22 +25,8 @@ Este projeto visa gamificar a produtividade, oferecendo uma experiência diverti
 *   **CSS3:** Estilização e responsividade, incluindo temas medievais e modais customizados.
 *   **JavaScript (ES6+):** Lógica principal do jogo, manipulação do DOM e gerenciamento de estado.
 
-## Como Executar Localmente
-Para rodar o TaskQuest RPG em seu ambiente local:
-
-1.  **Clone o Repositório:**
-    ```bash
-    git clone https://github.com/SEU_USUARIO/TaskQuest-RPG.git
-    ```
-    (Lembre-se de substituir `SEU_USUARIO` pelo seu nome de usuário do GitHub)
-
-2.  **Navegue até o Diretório:**
-    ```bash
-    cd TaskQuest-RPG
-    ```
-
-3.  **Abra o `index.html`:**
-    Simplesmente abra o arquivo `index.html` no seu navegador. Você pode usar uma extensão como "Live Server" para VS Code para facilitar o desenvolvimento.
+## Como Acessar
+Para acessar o TaskQuest diretamente pelo seu navegador, acesse: https://taskrpgmanager.netlify.app/
 
 ## Como Jogar
 *   **Escolha sua Classe:** Na tela inicial, selecione Guerreiro, Mago ou Arqueiro para definir seu estilo de jogo.
