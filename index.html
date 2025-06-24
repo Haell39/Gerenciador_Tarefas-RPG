@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>To-Do List RPG</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Open+Sans:wght@400;700&display=swap"
       rel="stylesheet"
@@ -43,18 +43,20 @@
         </div>
         <p class="class-description">
           <strong>Guerreiro:</strong> Forte e focado, pode ter até
-          <span style="color: #d63031; font-weight: bold;">5 missões</span>
+          <span style="color: #d63031; font-weight: bold">5 missões</span>
           pendentes, cada uma rendendo
-          <span style="color: green; font-weight: bold;">30 XP</span>. <br />
+          <span style="color: green; font-weight: bold">30 XP</span>. <br />
           <strong>Mago:</strong> Estrategista e versátil, pode ter até
-          <span style="color: #0984e3; font-weight: bold;">5 missões</span>
+          <span style="color: #0984e3; font-weight: bold">5 missões</span>
           pendentes e
-          <span style="color: #0984e3; font-weight: bold;">escolhe a dificuldade</span>
+          <span style="color: #0984e3; font-weight: bold"
+            >escolhe a dificuldade</span
+          >
           (20, 30 ou 50 XP). <br />
           <strong>Arqueiro:</strong> Ágil e numeroso, pode ter até
-          <span style="color: #00b894; font-weight: bold;">8 missões</span>
+          <span style="color: #00b894; font-weight: bold">8 missões</span>
           pendentes, cada uma rendendo
-          <span style="color: green; font-weight: bold;">20 XP</span>.
+          <span style="color: green; font-weight: bold">20 XP</span>.
         </p>
       </section>
 
@@ -73,9 +75,7 @@
         </div>
 
         <!-- Nova seção para dicas/bônus da classe -->
-        <div id="class-perk-display" class="class-description">
-          <!-- Conteúdo gerado pelo JS -->
-        </div>
+        <div id="class-perk-display" class="class-description"></div>
 
         <div id="task-manager">
           <h2>Minhas Missões (Tarefas)</h2>
@@ -104,16 +104,31 @@
             </div>
           </div>
         </div>
-        <button id="reset-game-btn">Recomeçar Aventura (Resetar)</button>
+
+        <!-- new container para os botões inferiores -->
+        <div class="game-actions-footer">
+          <button id="clear-completed-btn" class="secondary-btn">
+            Limpar Missões Concluídas
+          </button>
+          <button id="reset-game-btn">Recomeçar Aventura (Resetar)</button>
+        </div>
       </section>
     </div>
 
-    <!-- Modal para Missão Bônus -->
+    <!-- missão Bônus -->
     <div id="bonus-task-modal" class="modal-overlay">
       <div class="modal-content">
         <h3>Nova Missão Bônus!</h3>
-        <p>Parabéns, aventureiro! Ao atingir o Nível <span id="modal-level"></span>, você pode adicionar uma missão bônus especial.</p>
-        <input type="text" id="bonus-task-input" placeholder="Descreva sua missão bônus (ex: Ir ao shopping, Jogar, Descansar)..." />
+        <p>
+          Parabéns, aventureiro! Ao atingir o Nível
+          <span id="modal-level"></span>, você pode adicionar uma missão bônus
+          especial.
+        </p>
+        <input
+          type="text"
+          id="bonus-task-input"
+          placeholder="Descreva sua missão bônus (ex: Ir ao shopping, Jogar, Descansar)..."
+        />
         <div class="modal-buttons">
           <button id="add-bonus-task-btn">Adicionar Missão Bônus</button>
           <button id="cancel-bonus-task-btn">Cancelar</button>
@@ -121,7 +136,7 @@
       </div>
     </div>
 
-    <!-- Modal de Confirmação customizado (para substituir confirm()) -->
+    <!-- Modal de Confirmação  -->
     <div id="custom-confirm-modal" class="modal-overlay">
       <div class="modal-content">
         <p id="custom-confirm-message"></p>
@@ -132,7 +147,7 @@
       </div>
     </div>
 
-    <!-- Modal de Alerta customizado (para substituir alert()) -->
+    <!-- Modal de Alerta  -->
     <div id="custom-alert-modal" class="modal-overlay">
       <div class="modal-content">
         <p id="custom-alert-message"></p>
@@ -142,6 +157,6 @@
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="scripts/script.js"></script>
   </body>
 </html>

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const charXpDisplay = document.getElementById("char-xp");
   const charXpNextDisplay = document.getElementById("char-xp-next");
   const xpBarFill = document.getElementById("xp-bar-fill");
-  const classPerkDisplay = document.getElementById("class-perk-display"); // Novo elemento para exibir bônus da classe
+  const classPerkDisplay = document.getElementById("class-perk-display");
 
   const newTaskInput = document.getElementById("new-task-input");
   const taskDifficultySelect = document.getElementById("task-difficulty");
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pendingTasksList = document.getElementById("pending-tasks-list");
   const completedTasksList = document.getElementById("completed-tasks-list");
   const resetGameBtn = document.getElementById("reset-game-btn");
+  const clearCompletedBtn = document.getElementById("clear-completed-btn");
 
   // Modal de Missão Bônus
   const bonusTaskModal = document.getElementById("bonus-task-modal");
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const customConfirmYes = document.getElementById("custom-confirm-yes");
   const customConfirmNo = document.getElementById("custom-confirm-no");
-  let confirmCallback = null; // Callback para o custom confirm
+  let confirmCallback = null;
 
   // Custom Alert Modal
   const customAlertModal = document.getElementById("custom-alert-modal");
@@ -82,9 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const WARRIOR_XP_PER_TASK = 30;
   const ARCHER_XP_PER_TASK = 20;
-  const ARCHER_BONUS_XP_PER_CYCLE = 15; // Bônus para Arqueiro a cada 3 tarefas
-  const MAGE_BONUS_XP_PER_CYCLE = 25; // Bônus para Mago a cada 2 tarefas difíceis
-  const BONUS_TASK_XP = 100; // XP para missões bônus
+  const ARCHER_BONUS_XP_PER_CYCLE = 15;
+  const MAGE_BONUS_XP_PER_CYCLE = 25;
+  const BONUS_TASK_XP = 100;
+  const CANCELLATION_PENALTY_XP = 7;
 
   const TASK_LIMITS_BY_CLASS = {
     Guerreiro: 5,
@@ -92,9 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Arqueiro: 8,
   };
 
-  const INITIAL_XP_FOR_NEXT_LEVEL = 100;
-  const XP_LEVEL_MULTIPLIER = 50;
-  const MAX_LEVEL = 20; // Nível máximo para evolução de classe
+  const MAX_LEVEL = 20;
 
   const CLASS_EVOLUTIONS = {
     Guerreiro: "Warlord",
@@ -107,16 +107,15 @@ document.addEventListener("DOMContentLoaded", () => {
     class: null,
     level: 1,
     xp: 0,
-    xpToNextLevel: INITIAL_XP_FOR_NEXT_LEVEL,
-    completedArcherTasks: 0, // Contador para o bônus do Arqueiro
-    completedMageDifficultTasks: 0, // Contador para o bônus do Mago
-    bonusTasksClaimed: { 5: false, 10: false, 15: false, 20: false }, // Para controlar missões bônus por nível
+    xpToNextLevel: 100,
+    completedArcherTasks: 0,
+    completedMageDifficultTasks: 0,
+    bonusTasksClaimed: { 5: false, 10: false, 15: false, 20: false },
   };
-  let tasks = []; // Formato: {id: Date.now(), text: "...", completed: false, difficulty: "normal", xpReward: 30, isBonusTask: false}
+  let tasks = [];
   let nextTaskId = 1;
 
   // Funções de Gerenciamento do Jogo
-
   function saveGame() {
     localStorage.setItem("rpgTodoCharacter", JSON.stringify(character));
     localStorage.setItem("rpgTodoTasks", JSON.stringify(tasks));
@@ -130,8 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (savedCharacter) {
       character = JSON.parse(savedCharacter);
-
-      // Migração de dados: Garante que novas propriedades existam em jogos salvos antigos
       character.completedArcherTasks =
         character.completedArcherTasks !== undefined
           ? character.completedArcherTasks
@@ -144,10 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
         character.bonusTasksClaimed !== undefined
           ? character.bonusTasksClaimed
           : { 5: false, 10: false, 15: false, 20: false };
-
+      if (
+        character.xpToNextLevel !== calculateXpForNextLevel(character.level)
+      ) {
+        character.xpToNextLevel = calculateXpForNextLevel(character.level);
+      }
       if (savedTasks) {
         tasks = JSON.parse(savedTasks);
-        // Garante que tarefas antigas tenham 'xpReward' e 'isBonusTask' para compatibilidade
         tasks.forEach((task) => {
           if (task.xpReward === undefined) {
             if (character.class === "Mago" && task.difficulty) {
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (character.class === "Arqueiro") {
               task.xpReward = ARCHER_XP_PER_TASK;
             } else {
-              task.xpReward = MAGE_XP_REWARDS.normal; // Padrão
+              task.xpReward = MAGE_XP_REWARDS.normal;
             }
           }
           task.isBonusTask =
@@ -174,7 +174,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function calculateXpForNextLevel(level) {
-    return INITIAL_XP_FOR_NEXT_LEVEL + (level - 1) * XP_LEVEL_MULTIPLIER;
+    if (level >= 1 && level <= 5) {
+      return 100;
+    } else if (level >= 6 && level <= 10) {
+      return 150;
+    } else if (level >= 11 && level <= 15) {
+      return 200;
+    } else if (level >= 16 && level <= MAX_LEVEL) {
+      return 250;
+    }
+    return 250;
   }
 
   function updateStatusDisplay() {
@@ -182,11 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
     charLevelDisplay.textContent = character.level;
     charXpDisplay.textContent = character.xp;
     charXpNextDisplay.textContent = character.xpToNextLevel;
-
     const xpPercentage = (character.xp / character.xpToNextLevel) * 100;
     xpBarFill.style.width = `${Math.min(xpPercentage, 100)}%`;
-
-    // Animação para quando subir de nível
     if (xpPercentage >= 100) {
       setTimeout(() => {
         xpBarFill.style.transition = "none";
@@ -199,25 +205,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
       }, 600);
     }
-    updateClassPerkDisplay(); // Atualiza a exibição de bônus da classe
+    updateClassPerkDisplay();
   }
 
   function updateClassPerkDisplay() {
     let perkText = "";
-    if (character.class === "Guerreiro") {
-      perkText = `<strong>Guerreiro:</strong> Você pode
-        <span style="color: #d63031; font-weight: bold;">cancelar missões sem penalidade</span>.
-        Seja implacável!`;
-    } else if (character.class === "Arqueiro") {
-      perkText = `<strong>Arqueiro:</strong> Ganhe
-        <span style="color: green; font-weight: bold;">+${ARCHER_BONUS_XP_PER_CYCLE} XP de bônus</span>
-        a cada <span style="font-weight: bold;">3 missões concluídas</span>!
-        Concluídas este ciclo: ${character.completedArcherTasks % 3}/3`;
-    } else if (character.class === "Mago") {
-      perkText = `<strong>Mago:</strong> Ganhe
-        <span style="color: green; font-weight: bold;">+${MAGE_BONUS_XP_PER_CYCLE} XP de bônus</span>
-        a cada <span style="font-weight: bold;">2 missões difíceis concluídas</span>!
-        Concluídas este ciclo: ${character.completedMageDifficultTasks % 2}/2`;
+    if (character.class === "Guerreiro" || character.class === "Warlord") {
+      perkText = `<strong>Guerreiro:</strong> Você pode <span style="color: #d63031; font-weight: bold;">cancelar missões sem penalidade</span>. Seja implacável!`;
+    } else if (
+      character.class === "Arqueiro" ||
+      character.class === "Assassin"
+    ) {
+      perkText = `<strong>Arqueiro:</strong> Ganhe <span style="color: green; font-weight: bold;">+${ARCHER_BONUS_XP_PER_CYCLE} XP de bônus</span> a cada <span style="font-weight: bold;">3 missões concluídas</span>! Concluídas este ciclo: ${
+        character.completedArcherTasks % 3
+      }/3`;
+    } else if (character.class === "Mago" || character.class === "Archmage") {
+      perkText = `<strong>Mago:</strong> Ganhe <span style="color: green; font-weight: bold;">+${MAGE_BONUS_XP_PER_CYCLE} XP de bônus</span> a cada <span style="font-weight: bold;">2 missões difíceis concluídas</span>! Concluídas este ciclo: ${
+        character.completedMageDifficultTasks % 2
+      }/2`;
     }
     classPerkDisplay.innerHTML = perkText;
   }
@@ -225,34 +230,30 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTasks() {
     pendingTasksList.innerHTML = "";
     completedTasksList.innerHTML = "";
-
-    if (character.class === "Mago") {
+    if (character.class === "Mago" || character.class === "Archmage") {
       taskDifficultySelect.style.display = "inline-block";
     } else {
       taskDifficultySelect.style.display = "none";
     }
-
     tasks.forEach((task) => {
       const listItem = document.createElement("li");
       listItem.dataset.taskId = task.id;
-
       const taskContent = document.createElement("div");
       taskContent.classList.add("task-content");
-
       const taskText = document.createElement("span");
       taskText.classList.add("task-text");
       taskText.textContent = task.text;
       taskContent.appendChild(taskText);
-
       const taskDetails = document.createElement("span");
       taskDetails.classList.add("task-details");
-
       let detailText = ` (+${task.xpReward} XP)`;
-
       if (task.isBonusTask) {
         detailText = " ✨ Missão Bônus" + detailText;
-        taskDetails.style.color = "#8a2be2"; // Roxo para missões bônus
-      } else if (character.class === "Mago" && task.difficulty) {
+        taskDetails.style.color = "#8a2be2";
+      } else if (
+        (character.class === "Mago" || character.class === "Archmage") &&
+        task.difficulty
+      ) {
         detailText =
           ` (${
             task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1)
@@ -274,15 +275,12 @@ document.addEventListener("DOMContentLoaded", () => {
       taskDetails.textContent = detailText;
       taskContent.appendChild(taskDetails);
       listItem.appendChild(taskContent);
-
       const actionsContainer = document.createElement("div");
       actionsContainer.classList.add("task-actions");
-
       const deleteBtn = document.createElement("button");
       deleteBtn.classList.add("delete-btn");
       deleteBtn.textContent = "Excluir";
       deleteBtn.addEventListener("click", () => deleteTask(task.id));
-
       if (task.completed) {
         taskText.style.textDecoration = "line-through";
         taskText.style.color = "#888";
@@ -311,35 +309,42 @@ document.addEventListener("DOMContentLoaded", () => {
       showCustomAlert("A descrição da missão não pode estar vazia!");
       return;
     }
-
     const pendingTasks = tasks.filter(
       (task) => !task.completed && !task.isBonusTask
     ).length;
-    const taskLimit = TASK_LIMITS_BY_CLASS[character.class];
-
+    const taskLimit =
+      TASK_LIMITS_BY_CLASS[character.class] ||
+      TASK_LIMITS_BY_CLASS[
+        Object.keys(CLASS_EVOLUTIONS).find(
+          (key) => CLASS_EVOLUTIONS[key] === character.class
+        )
+      ];
     if (!isBonus && pendingTasks >= taskLimit) {
       showCustomAlert(
         `Como ${character.class}, você pode ter no máximo ${taskLimit} missões pendentes. Conclua algumas antes de adicionar mais!`
       );
       return;
     }
-
     let xpRewardForTask;
     let taskDifficulty = "normal";
-
     if (isBonus) {
       xpRewardForTask = BONUS_TASK_XP;
-    } else if (character.class === "Mago") {
+    } else if (character.class === "Mago" || character.class === "Archmage") {
       taskDifficulty = taskDifficultySelect.value;
       xpRewardForTask = MAGE_XP_REWARDS[taskDifficulty];
-    } else if (character.class === "Guerreiro") {
+    } else if (
+      character.class === "Guerreiro" ||
+      character.class === "Warlord"
+    ) {
       xpRewardForTask = WARRIOR_XP_PER_TASK;
-    } else if (character.class === "Arqueiro") {
+    } else if (
+      character.class === "Arqueiro" ||
+      character.class === "Assassin"
+    ) {
       xpRewardForTask = ARCHER_XP_PER_TASK;
     } else {
       xpRewardForTask = MAGE_XP_REWARDS.normal;
     }
-
     tasks.push({
       id: nextTaskId++,
       text: taskText,
@@ -361,10 +366,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (task && !task.completed) {
       task.completed = true;
       let xpGained = task.xpReward;
-
-      // Bônus específicos da classe
-      if (character.class === "Arqueiro" && !task.isBonusTask) {
-        // Bônus de Arqueiro
+      if (
+        (character.class === "Arqueiro" || character.class === "Assassin") &&
+        !task.isBonusTask
+      ) {
         character.completedArcherTasks++;
         if (character.completedArcherTasks % 3 === 0) {
           xpGained += ARCHER_BONUS_XP_PER_CYCLE;
@@ -373,11 +378,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       } else if (
-        character.class === "Mago" &&
+        (character.class === "Mago" || character.class === "Archmage") &&
         task.difficulty === "dificil" &&
         !task.isBonusTask
       ) {
-        // Bônus de Mago
         character.completedMageDifficultTasks++;
         if (character.completedMageDifficultTasks % 2 === 0) {
           xpGained += MAGE_BONUS_XP_PER_CYCLE;
@@ -386,12 +390,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       }
-
       character.xp += xpGained;
       checkLevelUp();
       renderTasks();
       updateStatusDisplay();
-      // Mensagem de feedback
       const feedback = document.createElement("p");
       feedback.textContent = `Missão "${task.text}" concluída! +${xpGained} XP!`;
       feedback.style.color = "green";
@@ -413,35 +415,75 @@ document.addEventListener("DOMContentLoaded", () => {
         (response) => {
           if (response) {
             tasks.splice(taskIndex, 1);
+            if (!task.completed) {
+              if (
+                character.class !== "Guerreiro" &&
+                character.class !== "Warlord"
+              ) {
+                character.xp = Math.max(
+                  0,
+                  character.xp - CANCELLATION_PENALTY_XP
+                );
+                showCustomAlert(
+                  `Missão cancelada! Você perdeu ${CANCELLATION_PENALTY_XP} XP.`
+                );
+              } else {
+                showCustomAlert(
+                  "Missão cancelada! Guerreiros não temem desistir de missões impossíveis!"
+                );
+              }
+            } else {
+              showCustomAlert(`Missão "${task.text}" removida das concluídas.`);
+            }
             renderTasks();
             updateStatusDisplay();
-            // Para Guerreiro, a "vontade" de cancelar é a ausência de penalidade
-            if (character.class === "Guerreiro") {
-              showCustomAlert(
-                "Missão cancelada! Guerreiros não temem desistir de missões impossíveis!"
-              );
-            }
           }
         }
       );
     }
   }
 
+  function clearCompletedTasks() {
+    const completedCount = tasks.filter((task) => task.completed).length;
+    if (completedCount === 0) {
+      showCustomAlert("Não há missões concluídas para limpar!");
+      return;
+    }
+    showCustomConfirm(
+      `Tem certeza que deseja limpar TODAS as ${completedCount} missões concluídas?`,
+      (response) => {
+        if (response) {
+          tasks = tasks.filter((task) => !task.completed);
+          renderTasks();
+          updateStatusDisplay();
+          showCustomAlert(
+            `Todas as ${completedCount} missões concluídas foram limpas!`
+          );
+        }
+      }
+    );
+  }
+
   function checkLevelUp() {
     let leveledUp = false;
-    while (character.xp >= character.xpToNextLevel) {
+    while (
+      character.xp >= character.xpToNextLevel &&
+      character.level < MAX_LEVEL
+    ) {
       character.level++;
       character.xp -= character.xpToNextLevel;
       character.xpToNextLevel = calculateXpForNextLevel(character.level);
       leveledUp = true;
-
-      // Resetar contadores de bônus de classe ao subir de nível
       character.completedArcherTasks = 0;
       character.completedMageDifficultTasks = 0;
     }
-
+    if (
+      character.level === MAX_LEVEL &&
+      character.xp >= character.xpToNextLevel
+    ) {
+      character.xp = character.xpToNextLevel;
+    }
     if (leveledUp) {
-      // Mensagem de feedback para level up
       const levelUpMsg = document.createElement("p");
       levelUpMsg.innerHTML = `✨🎉 <strong>LEVEL UP!</strong> 🎉✨<br>Você alcançou o Nível ${character.level} de ${character.class}!`;
       levelUpMsg.style.color = "#d35400";
@@ -453,8 +495,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("character-status").nextSibling
       );
       setTimeout(() => levelUpMsg.remove(), 5000);
-
-      // Adiciona um pequeno efeito visual no status
       const statusBox = document.getElementById("character-status");
       statusBox.style.transition =
         "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out";
@@ -464,21 +504,23 @@ document.addEventListener("DOMContentLoaded", () => {
         statusBox.style.transform = "scale(1)";
         statusBox.style.boxShadow = "none";
       }, 600);
-
-      // Checar evolução de classe no nível máximo
-      if (
-        character.level === MAX_LEVEL &&
-        character.class !== CLASS_EVOLUTIONS[character.class]
-      ) {
-        showCustomAlert(
-          `Parabéns! Sua classe evoluiu para ${
-            CLASS_EVOLUTIONS[character.class]
-          }!`
-        );
-        character.class = CLASS_EVOLUTIONS[character.class];
+      if (character.level === MAX_LEVEL && CLASS_EVOLUTIONS[character.class]) {
+        if (
+          character.class !==
+          CLASS_EVOLUTIONS[
+            Object.keys(CLASS_EVOLUTIONS).find(
+              (key) => CLASS_EVOLUTIONS[key] === character.class
+            ) || character.class
+          ]
+        ) {
+          showCustomAlert(
+            `Parabéns! Sua classe evoluiu para ${
+              CLASS_EVOLUTIONS[character.class]
+            }!`
+          );
+          character.class = CLASS_EVOLUTIONS[character.class];
+        }
       }
-
-      // Checar recompensas a cada 5 níveis
       if (
         character.level % 5 === 0 &&
         character.level <= MAX_LEVEL &&
@@ -491,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showBonusTaskModal(level) {
     modalLevelDisplay.textContent = level;
-    bonusTaskInput.value = ""; // Limpa o input
+    bonusTaskInput.value = "";
     bonusTaskModal.classList.add("active");
   }
 
@@ -505,9 +547,9 @@ document.addEventListener("DOMContentLoaded", () => {
       showCustomAlert("Por favor, descreva sua Missão Bônus.");
       return;
     }
-    addTask(true, bonusText); // Adiciona a tarefa como bônus
-    character.bonusTasksClaimed[character.level] = true; // Marca como reclamada
-    saveGame(); // Salva o jogo após adicionar e reclamar
+    addTask(true, bonusText);
+    character.bonusTasksClaimed[character.level] = true;
+    saveGame();
     hideBonusTaskModal();
     showCustomAlert(
       `Missão Bônus "${bonusText}" adicionada! Prepare-se para a aventura extra!`
@@ -521,9 +563,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response) {
           hideBonusTaskModal();
           showCustomAlert("Missão Bônus cancelada. A oportunidade se foi...");
-          // Opcional: character.bonusTasksClaimed[character.level] = true; se você quiser que cancelar signifique perder a chance.
-          // Atualmente, ao cancelar, a chance continua ativa para o nível atual.
-          // Se o usuário fechar e reabrir o modal, ele ainda poderá adicionar a missão b/c bonusTasksClaimed[level] is still false.
         }
       }
     );
@@ -533,17 +572,14 @@ document.addEventListener("DOMContentLoaded", () => {
     character.class = chosenClass;
     character.level = 1;
     character.xp = 0;
-    character.xpToNextLevel = INITIAL_XP_FOR_NEXT_LEVEL;
+    character.xpToNextLevel = calculateXpForNextLevel(1);
     character.completedArcherTasks = 0;
     character.completedMageDifficultTasks = 0;
-    character.bonusTasksClaimed = { 5: false, 10: false, 15: false, 20: false }; // Reinicia ao selecionar nova classe
-
-    tasks = []; // Limpa tarefas ao selecionar nova classe para evitar inconsistências
+    character.bonusTasksClaimed = { 5: false, 10: false, 15: false, 20: false };
+    tasks = [];
     nextTaskId = 1;
-
     classSelectionScreen.classList.remove("active");
     mainAppScreen.classList.add("active");
-
     updateStatusDisplay();
     renderTasks();
     saveGame();
@@ -557,27 +593,22 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.removeItem("rpgTodoCharacter");
           localStorage.removeItem("rpgTodoTasks");
           localStorage.removeItem("rpgTodoNextTaskId");
-
-          // reseta variáveis para o estado inicial
           character = {
             class: null,
             level: 1,
             xp: 0,
-            xpToNextLevel: INITIAL_XP_FOR_NEXT_LEVEL,
+            xpToNextLevel: calculateXpForNextLevel(1),
             completedArcherTasks: 0,
             completedMageDifficultTasks: 0,
             bonusTasksClaimed: { 5: false, 10: false, 15: false, 20: false },
           };
           tasks = [];
           nextTaskId = 1;
-
           mainAppScreen.classList.remove("active");
           classSelectionScreen.classList.add("active");
-
-          // limpa as listas na UI
           pendingTasksList.innerHTML = "";
           completedTasksList.innerHTML = "";
-          updateStatusDisplay(); // Atualiza a UI para o estado resetado
+          updateStatusDisplay();
         }
       }
     );
@@ -590,7 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  addTaskBtn.addEventListener("click", () => addTask()); // Chama addTask sem argumentos para tarefas normais
+  addTaskBtn.addEventListener("click", () => addTask());
   newTaskInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       addTask();
@@ -599,10 +630,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addBonusTaskBtn.addEventListener("click", handleAddBonusTask);
   cancelBonusTaskBtn.addEventListener("click", handleCancelBonusTask);
+  clearCompletedBtn.addEventListener("click", clearCompletedTasks);
 
   resetGameBtn.addEventListener("click", resetGame);
 
-  // Carrega o jogo ou mostra a parte de seleção de classe
   if (loadGame() && character.class) {
     classSelectionScreen.classList.remove("active");
     mainAppScreen.classList.add("active");
